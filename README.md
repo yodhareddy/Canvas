@@ -1,3 +1,3 @@
 # Canvas
 
-Migrating to Canvas db from personal database using Node js.
+Migrating to Canvas LMS db from mysql database using Node js.
