@@ -5,23 +5,25 @@ var connection_test = require('./module_test_db');
 
 var new1 = function(){
 
+
 connection_test.query("select ExID,ExName from behv.activityinfo where ExID IN (select ExID from behv.courseactivities where CID = 663) and Written='n' LIMIT 3", function(error,result1,fields){
 if(error) throw error;
 
-  for(var Ex in result1){
+  //for(var Ex in result1){
+  result1.forEach(result1=>{
 
     console.log("outerloop");
-//To Create new Quiz
-var options_newQuiz = {
-  url : 'https://unt.instructure.com/api/v1/courses/608/quizzes?access_token=',
-  method : 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  form: {
-     "quiz":{
-         "title": result1[Ex].ExName+"-"+result1[Ex].ExID,
-         //"title": "title",
+    //To Create new Quiz
+    var options_newQuiz = {
+      url : 'https://unt.instructure.com/api/v1/courses/608/quizzes?access_token='+accesstoken+'',
+      method : 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      form: {
+        "quiz":{
+         //"title": result1[Ex].ExName+"-"+result1[Ex].ExID,
+         "title": result1.ExName+"-"+result1.ExID,
          "quiz_type": "assignment",
          "allowed_attempts": 1,
          "one_question_at_a_time": true,
@@ -30,16 +32,16 @@ var options_newQuiz = {
      }
 
 
-};
+   };
 
-request(options_newQuiz,function(err,res,body){
-  if(err) throw err;
-  try{
-  body = JSON.parse(body);
-}catch(e){
-  console.log("Invalid JSON Quiz");
-}
-  console.log("New Quiz Created");
+   request(options_newQuiz,function(err,res,body){
+     if(err) throw err;
+     try{
+       body = JSON.parse(body);
+     }catch(e){
+       console.log("Invalid JSON Quiz");
+     }
+     console.log("New Quiz Created");
 
 //Functions:
 
@@ -117,7 +119,7 @@ request(options_newQuiz,function(err,res,body){
 
 
   //Get Data from Database
-  connection_test.query("select ExID,ItemNo,Question,Answer,MC1,MC2,MC3,MC4,MC5,ItemType from behv.items where ExID = '"+result1[Ex].ExID+"' order by ItemNo asc", function(err,result,fields){
+  connection_test.query("select ExID,ItemNo,Question,Answer,MC1,MC2,MC3,MC4,MC5,ItemType from behv.items where ExID = '"+result1.ExID+"' order by ItemNo asc", function(err,result,fields){
     if(err) throw err;
 
     //for(var count in result){
@@ -142,7 +144,7 @@ request(options_newQuiz,function(err,res,body){
           console.log("Invalid Json MMC");
         }
           var options_post = {
-            url : 'https://unt.instructure.com/api/v1/courses/608/quizzes/'+body.id+'/questions?access_token=',
+            url : 'https://unt.instructure.com/api/v1/courses/608/quizzes/'+body.id+'/questions?access_token='+accesstoken+'',
             method : 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -175,7 +177,7 @@ request(options_newQuiz,function(err,res,body){
             console.log("Invalid Json ans FIB");
           }
               var options_post = {
-              url : 'https://unt.instructure.com/api/v1/courses/608/quizzes/'+body.id+'/questions?access_token=',
+              url : 'https://unt.instructure.com/api/v1/courses/608/quizzes/'+body.id+'/questions?access_token='+accesstoken+'',
               method : 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -207,7 +209,7 @@ request(options_newQuiz,function(err,res,body){
               console.log("Invalid Json ans TF");
             }
               var options_post = {
-                url : 'https://unt.instructure.com/api/v1/courses/608/quizzes/'+body.id+'/questions?access_token=',
+                url : 'https://unt.instructure.com/api/v1/courses/608/quizzes/'+body.id+'/questions?access_token='+accesstoken+'',
                 method : 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -246,7 +248,8 @@ request(options_newQuiz,function(err,res,body){
 
 
 });//End of request call
-}//End of outer for loop
+//}//End of outer for loop
+});//End of outer forEach loop
 });//End of courseactivities function.
 };//End of function
 //module.exports = options_newQuiz;
